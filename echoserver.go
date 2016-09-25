@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"bufio"
 	"net"
 )
 
@@ -29,26 +29,22 @@ func handleClient(conn net.Conn) {
 	// close connection after handleClient returns
 	defer conn.Close()
 
-	fmt.Println("HELLO")
+	bufr := bufio.NewReader(conn)
+	message := make([]byte, 1024)
 
-	var message [512]byte
 	for {
-		n, err := conn.Read(message[0:])
-		if err != nil || string(message[0:]) == "#" {
+		readBytes, err := bufr.Read(message)
+		if err != nil {
 			return
 		}
 
 		message = reverse(message)
 
-		_, err = conn.Write(message[0:n])
-		if err != nil {
-			fmt.Printf("ERROR:%v", err)
-			return
-		}
+		conn.Write([]byte(string(message[:readBytes])))
 	}
 }
 
-func reverse(message [512]byte) [512]byte {
+func reverse(message []byte) []byte {
 
 	for i, j := 0, len(message)-1; i < j; i, j = i+1, j-1 {
 		message[i], message[j] = message[j], message[i]
