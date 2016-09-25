@@ -1,10 +1,15 @@
 package main
 
-import "net"
+import (
+	"net"
+	"os"
+)
 
 func main() {
 
-	listener, err := net.Listen("tcp", ":1234")
+	arg := os.Args[1]
+
+	listener, err := net.Listen("tcp", ":"+arg)
 	if err != nil {
 		return
 	}
