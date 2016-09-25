@@ -34,15 +34,15 @@ func handleClient(conn net.Conn) {
 			return
 		}
 
-		reverse(message, readBytes)
+		reverse(message[:readBytes])
 
-		conn.Write([]byte(string(message[:readBytes])))
+		conn.Write(message[:readBytes])
 	}
 }
 
-func reverse(message []byte, readBytes int) {
+func reverse(message []byte) {
 
-	for i, j := 0, readBytes-1; i < j; i, j = i+1, j-1 {
+	for i, j := 0, len(message)-1; i < j; i, j = i+1, j-1 {
 		message[i], message[j] = message[j], message[i]
 	}
 }
