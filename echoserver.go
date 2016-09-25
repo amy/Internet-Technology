@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
 	"net"
 	"os"
 )
@@ -21,27 +23,38 @@ func main() {
 			continue
 		}
 
-		// connection logic
-		handleClient(conn)
+		// Go routine to handle connection
+		go handleClient(conn)
 	}
 }
 
 func handleClient(conn net.Conn) {
 
-	// close connection after handleClient returns
+	// close connection when handleClient returns
 	defer conn.Close()
 
-	message := make([]byte, 512)
+	// scan each line of client input
+	scanner := bufio.NewScanner(conn)
 
-	for {
-		readBytes, err := conn.Read(message)
-		if err != nil {
+	for scanner.Scan() {
+		message := scanner.Bytes()
+
+		// returns from handleClient when terminating characters given
+		if closeConnection(string(message)) {
 			return
 		}
 
-		reverse(message[:readBytes])
+		// reverse message in place
+		reverse(message)
 
-		conn.Write(message[:readBytes])
+		// stupid Java client won't recognize the end of a message without a newline char
+		message = append(message, "\n"...)
+
+		// print to standard out
+		fmt.Print(string(message))
+
+		// write message to client
+		conn.Write(message)
 	}
 }
 
@@ -50,4 +63,13 @@ func reverse(message []byte) {
 	for i, j := 0, len(message)-1; i < j; i, j = i+1, j-1 {
 		message[i], message[j] = message[j], message[i]
 	}
+}
+
+func closeConnection(message string) bool {
+
+	if message == "#" || message == "$" {
+		return true
+	}
+
+	return false
 }
