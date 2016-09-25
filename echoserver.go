@@ -29,8 +29,8 @@ func handleClient(conn net.Conn) {
 	// close connection after handleClient returns
 	defer conn.Close()
 
+	var message []byte
 	bufr := bufio.NewReader(conn)
-	message := make([]byte, 1024)
 
 	for {
 		readBytes, err := bufr.Read(message)
@@ -38,7 +38,7 @@ func handleClient(conn net.Conn) {
 			return
 		}
 
-		message = reverse(message)
+		//message = reverse(message)
 
 		conn.Write([]byte(string(message[:readBytes])))
 	}
