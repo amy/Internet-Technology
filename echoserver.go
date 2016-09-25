@@ -1,9 +1,6 @@
 package main
 
-import (
-	"bufio"
-	"net"
-)
+import "net"
 
 func main() {
 
@@ -30,10 +27,9 @@ func handleClient(conn net.Conn) {
 	defer conn.Close()
 
 	message := make([]byte, 5)
-	bufr := bufio.NewReader(conn)
 
 	for {
-		readBytes, err := bufr.Read(message)
+		readBytes, err := conn.Read(message)
 		if err != nil {
 			return
 		}
