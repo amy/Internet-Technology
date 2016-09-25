@@ -16,8 +16,8 @@ func main() {
 			continue
 		}
 
-		// go routine for connection logic
-		go handleClient(conn)
+		// connection logic
+		handleClient(conn)
 	}
 }
 
@@ -26,7 +26,7 @@ func handleClient(conn net.Conn) {
 	// close connection after handleClient returns
 	defer conn.Close()
 
-	message := make([]byte, 5)
+	message := make([]byte, 512)
 
 	for {
 		readBytes, err := conn.Read(message)
@@ -34,17 +34,15 @@ func handleClient(conn net.Conn) {
 			return
 		}
 
-		message = reverse(message)
+		reverse(message, readBytes)
 
 		conn.Write([]byte(string(message[:readBytes])))
 	}
 }
 
-func reverse(message []byte) []byte {
+func reverse(message []byte, readBytes int) {
 
-	for i, j := 0, len(message)-1; i < j; i, j = i+1, j-1 {
+	for i, j := 0, readBytes-1; i < j; i, j = i+1, j-1 {
 		message[i], message[j] = message[j], message[i]
 	}
-
-	return message
 }
